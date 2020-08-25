@@ -71,13 +71,34 @@
                 type:'get',
                 dataType:'json',
                 success: function(backData){
-                    // console.log(backData);
+                    console.log(backData);
                     $('.user_info>img').attr('src',backData.data.userPic) // 渲染数据
                     $('.user_center_link>img').attr('src',backData.data.userPic)
                     $('.user_info>span').html('欢迎&emsp;'+backData.data.nickname)
                 }
             });
         })
+
+        /* // 原生ajax添加token
+        let xhr = new XMLHttpRequest; // 实例化ajax对象
+        //(2).设置请求方法和地址
+        //get请求的数据直接添加在url的后面 格式是 url?key=value
+        xhr.open('get','http://localhost:8080/api/v1/admin/user/info')
+        xhr.setRequestHeader('Authorization',localStorage.getItem('token')) // 此处请求声明头规定一定要加Authorization
+        xhr.send() // 发送请求
+        xhr.onload = function () {
+            console.log(xhr.responseText);
+        } */
+
+        
+        
+       /*  // jQuery.ajax添加token
+        $.ajaxSetup({                      // 里面是对象
+            beforeSend:function (xhr) {
+                xhr.setRequestHeader('Authorization',localStorage.getItem('token'))
+            }
+        }) */
+
     </script>
 </body>
 </html>
