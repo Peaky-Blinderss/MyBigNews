@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,113 @@
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/iconfont.css">
     <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="">
-</head>
-<body>
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="libs/bootstrap/css/bootstrap.min.css">
+    <!-- jQuery -->
+    <script src="libs/jquery-1.12.4.min.js"></script>
+    <!-- bootstrap的js文件 -->
+    <script src="libs/bootstrap/js/bootstrap.min.js"></script>
 
+</head>
+
+<body>
+    <div class="main_wrap">
+        <div class="header">
+            <a href="#" class="logo"><img src="images/logo.png" alt="" /></a>
+            <div class="copyright">
+                CopyRight © 2019 深圳百秀信息技术股份有限公司<br />All Rights Reserved
+            </div>
+        </div>
+
+        <div class="login_form_con">
+            <div class="login_title"></div>
+            <form class="login_form">
+                <i class="iconfont icon-user"></i>
+                <i class="iconfont icon-key"></i>
+                <input type="text" class="input_txt" placeholder="邮箱/手机号" />
+                <input type="password" class="input_pass" placeholder="密码" />
+                <input type="submit" class="input_sub" value="登 录" />
+            </form>
+        </div>
+    </div>
+
+    <!-- 模态框 -->
+    <div class="modal fade" tabindex="-1" role="dialog" id="myModal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Tips:</h4>
+                </div>
+                <div class="modal-body">
+                    <p>One fine body&hellip;</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+                    <!-- btn-info修改字体颜色 -->
+                    <!-- <button type="button" class="btn btn-primary">Save changes</button>   去掉一个按钮  没用的 -->
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+
+    <script>
+        // 网站基地址: http://localhost:8080/api/v1
+
+        /* 思路:
+        1. 给登录按钮注册点击事件 
+        2. 阻止默认跳转事件( form表单submit会自动跳转页面 )
+        3. 获取用户名和密码
+        4. 非空判断
+        5. ajax发送请求
+        6. 处理响应结果 a. 成功:跳转后台管理系统首页 b. 失败:提示用户
+        */
+        // 进入页面默认选中input表单
+        $('.input_txt').focus()
+        $(function () {
+            $('.input_sub').on('click', function (e) {
+                e.preventDefault() // 阻止默认跳转(form表单)
+                let username = $('.input_txt').val()
+                let password = $('.input_pass').val()
+                if (username.length == 0 || password.length == 0) { // 非空判断
+                    // alert('wdnmd');
+                    $('.modal-body>p').text('请输入正确的用户名/密码') // 修改提示内容
+                    $('#myModal').modal() // 模态框 (好看一点)
+                    return;
+                }
+                // 发送用户登录请求
+                $.ajax({
+                    url: 'http://localhost:8080/api/v1/admin/user/login',
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        username: username,
+                        password: password
+                    },
+                    success: function (backData) {
+                        console.log(backData);
+                        if (backData.code == 200) {
+                            localStorage.setItem('token',backData.token) // 储存用户令牌token到本地
+
+                            $('.modal-body>p').text('登录成功') // 修改提示内容
+
+                            $('#myModal').modal() // 弹出模态框
+                            // 给模态框注册消失事件(官方文本)  否则会直接跳转页面不显示模态框
+                            $('#myModal').on('hidden.bs.modal', function (e) {
+                                window.location.href = 'index.html' // 跳转到首页
+                            })
+                        } else {
+                            $('.modal-body>p').text(backData.msg) // 修改模态框文本为自动生成的提示(登录失败之类的)
+                            $('#myModal').modal() // 弹出模态框
+                        }
+                    }
+                });
+            })
+        })
+    </script>
 </body>
+
 </html>
