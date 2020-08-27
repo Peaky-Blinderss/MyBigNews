@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="css/iconfont.css">
     <link rel="stylesheet" href="css/main.css">
     <script src="./libs/jquery-1.12.4.min.js"></script>
-
+    <script src="./js/http.js"></script>
 </head>
 
 <body>
@@ -44,11 +44,12 @@
                     <label for="inputPassword3" class="col-sm-2 control-label">用户图标：</label>
                     <div class="col-sm-10">
                         <img src="images/2.jpg" alt="" class="user_pic">
-                        <input style="display: block" name="userPic" type="file" id="exampleInputFile">
+                        <input style="display: none" name="userPic" type="file" id="exampleInputFile">
                         <!-- 给label标签的for属性赋值,值是input标签的id,那这样的话点击label就相当于点击了input -->
                         <br>
                         <label for="exampleInputFile">
-                            <img src="./images/uploads_icon.jpg" style="height: 50px;" alt="">
+                            <img src="./images/uploads_icon.jpg" style="height: 50px;cursor: pointer;" alt="">
+                            点击上传头像
                         </label>
                     </div>
                 </div>
@@ -69,5 +70,81 @@
         </div>
     </div>
 </body>
+
+<script>
+    // 入口函数
+    $(function () {
+        /* 1.页面一加载：ajax请求用户详细信息 */
+        $.ajax({
+            url: API['user']['detail'],
+            type: 'get',
+            dataType: 'json',
+            success: function (backData) {
+                console.log(backData);
+                // 渲染页面
+                /* 
+                1.
+                $('.user_pic').attr('src', backData.data.userPic)
+                $('.username').val(backData.data.username)
+                $('.nickname').val(backData.data.nickname)
+                $('.email').val(backData.data.email)
+                $('.password').val(backData.data.password) */
+
+                // 2  利用遍历对象快速赋值
+                for (let key in backData.data) {
+                    // console.log(backData.data[key]);
+                    $(`.${key}`).val(backData.data[key])
+                    $('.user_pic').attr('src', backData.data.userPic)
+                }
+            }
+        });
+
+        // 图片文件预览
+        $('#exampleInputFile').on('change', function () { // (1)给文件预览按钮注册change事件
+
+            //(2)获取用户选择的文件
+            let file = this.files[0];
+            // console.log(file);
+
+            //(3)根据文件生成url
+            let url = URL.createObjectURL(file)
+            // console.log(url);
+
+            //(4)给img的src赋值url
+            $('.user_pic').attr('src', url)
+        })
+
+
+        // 点击修改按钮阻止form表单默认跳转页面
+        $('.btn-edit').on('click', function (e) {
+            e.preventDefault();
+            // 请求数据提交编辑
+            let fd = new FormData($('form')[0]);
+            $.ajax({
+                url: API['user']['edit'],
+                type: 'post',
+                dataType: 'json',
+                data: fd,
+                processData: false,
+                contentType: false,
+                success: function (backData) {
+                    // console.log(backData);
+                    if(backData.code == 200) {
+                        alert('修改成功!');
+                        // console.log(window.parent);
+                        window.parent.location.reload()
+                        //刷新首页
+                            /* 
+                            window : 当前窗口  user.html
+                            window.parent : 父窗口 index.html
+                            */
+                    }else{
+                        alert(backData.msg);
+                    }
+                }
+            });
+        })
+    })
+</script>
 
 </html>

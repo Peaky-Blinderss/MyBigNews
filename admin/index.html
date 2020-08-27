@@ -13,6 +13,7 @@
     <script src="./libs/jquery-1.12.4.min.js"></script>
     <!-- 导入bootstrap的js文件 -->
     <script src="./libs/bootstrap/js/bootstrap.min.js"></script>
+    <script src="./js/http.js"></script>
     <style>
         iframe {
             display: block;
@@ -38,9 +39,12 @@
             <div class="level01"><a href="#"><i class="iconfont icon-icon-article"></i><span>文章管理</span><b
                         class="iconfont icon-arrowdownl"></b></a></div>
             <ul class="level02">
-                <li><a href="./article_list.html" target="main_frame"><i class="iconfont icon-previewright"></i><span>文章列表</span></a></li>
-                <li><a href="./article_release.html" target="main_frame"><i class="iconfont icon-previewright"></i><span>发表文章</span></a></li>
-                <li><a href="./article_category.html" target="main_frame"><i class="iconfont icon-previewright"></i><span>文章类别管理</span></a>
+                <li><a href="./article_list.html" target="main_frame"><i
+                            class="iconfont icon-previewright"></i><span>文章列表</span></a></li>
+                <li><a href="./article_release.html" target="main_frame"><i
+                            class="iconfont icon-previewright"></i><span>发表文章</span></a></li>
+                <li><a href="./article_category.html" target="main_frame"><i
+                            class="iconfont icon-previewright"></i><span>文章类别管理</span></a>
                 </li>
             </ul>
             <div class="level01"><a href="comment_list.html" target="main_frame"><i
@@ -75,11 +79,11 @@
         // 入口函数
         $(function () {
             $.ajax({
-                url: 'http://localhost:8080/api/v1/admin/user/info',
+                url: API['user']['info'],
                 type: 'get',
                 dataType: 'json',
                 success: function (backData) {
-                    console.log(backData);
+                    // console.log(backData);
                     $('.user_info>img').attr('src', backData.data.userPic) // 渲染数据
                     $('.user_center_link>img').attr('src', backData.data.userPic)
                     $('.user_info>span').html('欢迎&emsp;' + backData.data.nickname)
@@ -87,12 +91,35 @@
             });
 
             // 点击第一层级排他
-            $('.menu .level01').on('click',function () {
+            $('.menu .level01').on('click', function () {
                 $(this).addClass('active').siblings().removeClass('active')
-                if($(this).index() == 1) {
+                if ($(this).index() == 1) {
                     $('.level02').slideToggle() // 如果点击文章管理 则下拉列表ul
-                    $(this).find('b').toggleClass('rotate0')
+                    $(this).find('b').toggleClass('rotate0') // 箭头旋转 toggle可以交替
+
+                    // 点击文章管理自动显示第一层子元素
+
+                    /* 
+                    特殊知识点: a标签有两种事件 (1)默认跳转事件  (2)注册事件
+
+                    $().click(): 这是jq对象的方法 只能触发注册事件
+                    $()[0]: 将jq对象转成DOM对象,为了可以调用DOM原生方法
+                    $()[0].click(): 这是DOM原生语法的click()方法
+                        * a标签原生的语法,既可以调用onclick(),也可以调用click()
+                        * onclick()只能触发事件
+                        * click()可以触发默认事件和 注册事件
+                     */
+
+                    $('.level02 li:eq(0) a')[0].click() // [0]先转化成DOM对象
+                    // console.log($('.level02 li:eq(0) a')[0]);
+                }else{ // 如果不是点击文章管理 则让下拉列表字体样式消失 并收起下拉菜单
+                    $('.level02 li').removeClass('active').parent().slideUp().prev().find('b').removeClass('rotate0')
+                                //    二级菜单移除字体样式          ul收起                       箭头角度归位
                 }
+            });
+            // 二级菜单点击之后设置字体颜色排他
+            $('.level02 li').on('click', function () { 
+                $(this).addClass('active').siblings().removeClass('active')
             })
         })
 
