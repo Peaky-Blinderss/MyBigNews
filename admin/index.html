@@ -94,7 +94,7 @@
             $('.menu .level01').on('click', function () {
                 $(this).addClass('active').siblings().removeClass('active')
                 if ($(this).index() == 1) {
-                    $('.level02').slideToggle() // 如果点击文章管理 则下拉列表ul
+                    $('.level02').stop().slideToggle() // 如果点击文章管理 则下拉列表ul
                     $(this).find('b').toggleClass('rotate0') // 箭头旋转 toggle可以交替
 
                     // 点击文章管理自动显示第一层子元素
