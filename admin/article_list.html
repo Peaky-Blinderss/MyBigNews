@@ -75,11 +75,88 @@
     </div>
 
 
+
+    <!-- 模板引擎1  下拉菜单列表 -->
+    <script id="cat_list" type="text/html">
+        <option value="">所有分类</option>
+        {{each data v}}
+        <option value="{{v.id}}">{{v.name}}</option>
+        {{/each}}
+    </script>
+
+    <!-- 模板引擎2  页面主体 -->
+    <script id="art_list" type="text/html">
+        {{each data.data v}}
+        <tr>
+            <td>{{v.title}}</td>
+            <td>{{v.author}}</td>
+            <td>{{v.category}}</td>
+            <td class="text-center">{{v.date}}</td>
+            <td class="text-center">{{v.state}}</td>
+            <td class="text-center">
+                <a href="article_edit.html" class="btn btn-default btn-xs btn-edit">编辑</a>
+                <a href="javascript:void(0);" class="btn btn-danger btn-xs btn-delete">删除</a>
+            </td>
+        </tr>
+        {{/each}}
+    </script>
     <script>
         // 入口函数
         $(function () {
-            // 页面一加载,就渲染'所有分类'的下拉菜单,然后渲染主体页面
-        })
+            // 页面一加载,就获取所有文章类别  渲染'所有分类'的下拉菜单,然后渲染主体页面
+            $.ajax({
+                url: API.category.list,
+                type: 'get',
+                dataType: 'json',
+                success: function (backData) {
+                    // console.log(backData);
+                    $('#selCategory').html(template('cat_list', backData)) // 渲染select菜单
+                }
+            });
+
+            
+            // 给筛选按钮注册点击事件
+            $('#btnSearch').on('click', function (e) {
+                // 阻止form表单默认跳转
+                e.preventDefault();
+
+                $.ajax({
+                    url: API.article.query,
+                    type: 'get',
+                    dataType: 'json',
+                    data: {
+                        type: $('#selCategory').val(), // ***** 注意 此处val()取值是优先取option的value值 (id)   所以要把{{v.id}}写在option的value属性里面
+                        state: $('#selStatus').val(),
+                        page: 1,
+                        perpage: 10
+                    },
+                    success: function (backData) {
+                        // console.log(backData);
+                        $('tbody').html(template('art_list', backData))
+                    }
+                });
+            });
+
+            // 页面一打开,ajax请求所有文章列表 主动触发 注意: 必须要先注册筛选按钮点击事件才可以调用
+            // 请求搜索文章
+
+            // $.ajax({                         * 代码冗余
+            //     url: API.article.query,
+            //     type: 'get',
+            //     dataType: 'json',
+            //     data: {
+            //         type: '',
+            //         state: '',
+            //         page: 1,
+            //         perpage: 10
+            //     },
+            //     success: function (backData) {
+            //         console.log(backData);
+            //         $('tbody').html(template('art_list', backData))
+            //     }
+            // });
+            $('#btnSearch').click();
+        });
     </script>
 </body>
 

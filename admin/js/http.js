@@ -48,4 +48,4 @@ for (let key in apiMap) {
     for (let method of apiMap[key]) {
         API[key][method] = `${baseURL}/admin/${key}/${method}`
     }
-}
+} // 用法API.key.method
