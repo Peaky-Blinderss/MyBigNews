@@ -98,7 +98,8 @@
             <td class="text-center">{{v.date}}</td>
             <td class="text-center">{{v.state}}</td>
             <td class="text-center">
-                <a href="article_edit.html" class="btn btn-default btn-xs btn-edit">编辑</a>
+                <a href="article_edit.html?id={{v.id}}" class="btn btn-default btn-xs btn-edit">编辑</a>
+                <!-- 此处跳转页面需要在页面地址后面加id，将当前文章id传入编辑页面，供其使用 -->
                 <a href="javascript:void(0);" class="btn btn-danger btn-xs btn-delete" data-id="{{v.id}}">删除</a>
             </td>
         </tr>
@@ -139,9 +140,9 @@
                         // console.log(backData);
                         $('tbody').html(template('art_list', backData))
                         // 页面一加载调用分页插件初始化
+                        $('#page').twbsPagination('destroy') // 页面一加载先清除旧的分页插件
                         $('#page').twbsPagination({ // 注意id一致
-                            totalPages: backData.data
-                            .totalPage, // 总页数 (一般不写死,一般是根据数据自动生成,这里写的是ajax返回的总页数totalpage)
+                            totalPages: backData.data.totalPage, // 总页数 (一般不写死,一般是根据数据自动生成,这里写的是ajax返回的总页数totalpage)
                             startPage: 1, // 页面加载默认选中页数
                             visiblePages: 5, // 可视最大页数
                             first: '首页',
@@ -192,16 +193,18 @@
 
 
             // 删除功能  注意使用委托事件
-            $('table>tbody').on('click','.btn-delete',function () {
+            $('table>tbody').on('click', '.btn-delete', function () {
                 let id = $(this).attr('data-id')
                 // console.log(id);
                 /* 调用ajax */
                 $.ajax({
-                    url:API.article.delete,
-                    type:'post',
-                    dataType:'json',
-                    data:{id:id},
-                    success: function(backData){
+                    url: API.article.delete,
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        id: id
+                    },
+                    success: function (backData) {
                         // console.log(backData);
                         if (backData.code == 204) {
                             alert(backData.msg);
