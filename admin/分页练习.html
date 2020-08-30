@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <!-- 1.导包 -->
+    <script src="./libs/jquery-1.12.4.min.js"></script> <!-- 先导JQ -->
+    <link rel="stylesheet" href="./libs/bootstrap/css/bootstrap.min.css">
+    <script src="./libs/jquery.twbsPagination.js"></script>
+</head>
+
+<body>
+    <!-- 2.写HTML结构 (CV) -->
+    <ul id="page" class="pagination-sm"></ul>
+</body>
+<script>
+    // 初始化 (CV)
+    // $('#page').twbsPagination({ // 注意id一致
+    //     totalPages: 35, // 总页数 (一般不写死,一般是根据数据自动生成)
+    //     startPage: 2, // 页面加载默认选中页数
+    //     visiblePages: 5, // 可视最大页数
+    //     first: '首页',
+    //     prev: '上一页',
+    //     next: '下一页',
+    //     last: '尾页',
+
+    //     onPageClick: function (event, page) { // 点击(页码)回调事件
+    //         $('#page-content').text('Page ' + page);
+            // console.log(page);   page为页码 
+
+            /* 先清除 */
+            $('#page').twbsPagination('destroy'); // 固定语法   分页器 + .twbsPagination('destroy')
+            /* 再调用 */
+            $('#page').twbsPagination({ // 注意id一致
+                totalPages: 30, // 总页数 (一般不写死,一般是根据数据自动生成)
+                startPage: 2, // 页面加载默认选中页数
+                visiblePages: 5, // 可视最大页数
+                first: '首页',
+                prev: '上一页',
+                next: '下一页',
+                last: '尾页',
+
+                onPageClick: function (event, page) { // 点击(页码)回调事件
+                    $('#page-content').text('Page ' + page);
+                    // console.log(page);   page为页码 
+                }
+            });
+        // }
+    // });
+</script>
+
+</html>
