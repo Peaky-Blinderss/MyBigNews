@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="css/main.css">
     <!-- 日期css -->
     <link rel="stylesheet" href="./libs/jedate/css/jedate.css">
+    <link rel="stylesheet" href="libs/jedate/css/jeDate-test.css">
     <!-- jq -->
     <script src="./libs/jquery-1.12.4.min.js"></script>
     <!-- 模板引擎 -->
@@ -20,6 +21,7 @@
     <script src="./libs/jedate/js/jedate.js"></script>
     <!-- 富文本编辑 -->
     <script src="./libs/wangEditor.min.js"></script>
+    <script src="js/http.js"></script>
 </head>
 
 <body>
@@ -32,7 +34,7 @@
                 <div class="form-group">
                     <label for="inputTitle" class="col-sm-2 control-label">文章标题：</label>
                     <div class="col-sm-10">
-                        <input type="text" name="title" class="form-control title" id="inputTitle" value="文章标题文字">
+                        <input type="text" name="title" class="form-control title" id="inputTitle" placeholder="文章标题文字">
                     </div>
                 </div>
                 <div class="form-group">
@@ -57,13 +59,22 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label">发布时间：</label>
                     <div class="col-sm-4">
-
+                        <!-- 日期控件 -->
+                        <div class="jeinpbox">
+                            <input type="text" class="jeinput" id="testico" placeholder="YYYY-MM-DD">
+                            <div class="icons jebtns"
+                                onclick="jeDate('#testico',{trigger:false,format: 'YYYY-MM-DD',zIndex: 10001})">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="inputEmail3" class="col-sm-2 control-label">文章内容：</label>
                     <div class="col-sm-10">
-
+                        <!-- 富文本编辑器 -->
+                        <div id="editor">
+                            <p></p>
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
@@ -76,11 +87,77 @@
         </div>
     </div>
 
+
+    <!-- 模板引擎 -->
+    <script id="category_list" type="text/html">
+        {{each data v}}
+        <option value="{{v.id}}">{{v.name}}</option>
+        {{/each}}
+    </script>
     <script>
         // 入口函数   
         $(function () {
-            
-        })     
+            // 日期插件
+            jeDate('#testico', {
+                trigger: 'click',
+                format: 'YYYY-MM-DD',
+                zIndex: 10001
+            });
+            // 富文本编辑器插件
+            let E = window.wangEditor
+            let editor = new E('#editor')
+            editor.create()
+
+            // ajax获取所有类别并渲染到文章列表里
+            $.ajax({
+                url: API.category.list,
+                type: 'get',
+                dataType: 'json',
+                success: function (backData) {
+                    // console.log(backData);
+                    $('.category').html(template('category_list', backData))
+                }
+            });
+
+            // 注册文件预览按钮点击改变事件
+            $('#inputCover').on('change', function () {
+                let file = this.files[0]
+                // console.log(file);
+                let url = URL.createObjectURL(file)
+                // console.log(url);
+                $('.article_cover').attr('src', url)
+            })
+
+            // 同时为 发布、存为草稿 按钮注册点击事件
+            $('.btn-release,.btn-draft').on('click', function (e) {
+                e.preventDefault(); // 阻止form表单提交按钮默认跳转事件
+                // ajax发送请求发布文章
+                //禁用表单默认提交事件
+                let fd = new FormData($('form')[0])
+                fd.append('date', $('#testico').val())
+                fd.append('content', editor.txt.html())
+                fd.append('state', $(this).text() == '发布' ? '已发布' : '')
+                $.ajax({
+                    url: API.article.publish,
+                    type: 'post',
+                    dataType: 'json',
+                    data: fd,
+                    contentType: false,
+                    processData: false,
+                    success: function (backData) {
+                        // console.log(backData);
+                        if (backData.code == 200) {
+                            alert(backData.msg);
+                            // console.log($('.level02>li:eq(0)',window.parent.document));
+                            $('.level02>li:eq(0)',window.parent.document).click()
+                            window.location.href = 'article_list.html'
+                        } else {
+                            alert(backData.msg);
+                        }
+                    }
+                });
+            })
+        })
     </script>
 </body>
 

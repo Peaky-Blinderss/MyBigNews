@@ -216,6 +216,11 @@
                 });
             })
 
+            // 给发布文章按钮注册点击事件，点击之后父盒子左侧tab栏高亮
+            $('#release_btn').on('click',function () {
+                $('.level02>li:eq(1)',window.parent.document).click()
+            })
+
         });
     </script>
 </body>
