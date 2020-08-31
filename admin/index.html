@@ -142,6 +142,13 @@
                  xhr.setRequestHeader('Authorization',localStorage.getItem('token'))
              }
          }) */
+
+         // 退出按钮
+         $('.logout').on('click',function () {
+            localStorage.removeItem('token'),
+            alert('Wdnmd !');
+            window.location.href = 'login.html'
+         })
     </script>
 </body>
 
